@@ -1,14 +1,22 @@
-# Use OpenJDK base image
-FROM eclipse-temurin:17-jdk-alpine
+# Stage 1: Build the application using Gradle
+FROM gradle:8.4.0-jdk17 AS build
 
-# Set the working directory
+# Copy all files
+COPY --chown=gradle:gradle . /app
+
 WORKDIR /app
 
-# Copy build output
-COPY build/libs/*.jar app.jar
+# Build the project
+RUN gradle build --no-daemon
 
-# Expose port
+# Stage 2: Run the application
+FROM eclipse-temurin:17-jdk-alpine
+
+WORKDIR /app
+
+# Copy jar from the build stage
+COPY --from=build /app/build/libs/*.jar app.jar
+
 EXPOSE 8080
 
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
