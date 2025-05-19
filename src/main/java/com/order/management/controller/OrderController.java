@@ -40,5 +40,9 @@ public class OrderController {
         return removed ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/health")
+    public String healthCheck() {
+        return "OK";
+    }
 
 }
